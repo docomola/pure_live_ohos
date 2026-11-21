@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Builds the HarmonyOS debug HAP for pure_live.
+# Builds the HarmonyOS HAP for pure_live.
+#
+# Build mode: defaults to debug. Override with BUILD_MODE=release, or pass
+# --release / --profile / --debug explicitly; an explicit flag always wins.
 #
 # Wraps `flutter build hap` with the environment quirks this machine needs so
 # the build is one command instead of a remembered sequence:
@@ -11,7 +14,7 @@
 #   - java must be reachable on PATH as well as JAVA_HOME, otherwise the
 #     PackageHap step dies with "spawn java ENOENT".
 #
-# Usage: tool/build_hap.sh [extra flutter args]
+# Usage: BUILD_MODE=release tool/build_hap.sh [extra flutter args]
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -29,4 +32,12 @@ echo "flutter: $(command -v flutter)"
 echo "java:    $(command -v java)"
 echo "node:    $(command -v node)"
 
-flutter build hap --debug "$@"
+build_mode="${BUILD_MODE:-debug}"
+case " $* " in
+  *" --release "*)  build_mode=release ;;
+  *" --profile "*)  build_mode=profile ;;
+  *" --debug "*)    build_mode=debug ;;
+esac
+
+echo "mode:    $build_mode"
+flutter build hap "--$build_mode" "$@"
