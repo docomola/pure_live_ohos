@@ -1,0 +1,62 @@
+name: media_core_audio
+description: Music playback for media_core - sources, queue and play modes, lyrics and the native desktop-lyric windows, plus ffmpeg downloads.
+version: 0.1.0
+publish_to: none
+repository: https://github.com/liuchuancong/media_core
+issue_tracker: https://github.com/liuchuancong/media_core/issues
+resolution: workspace
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  media_core:
+    path: ../media_core
+
+  # Background audio + media notification (lock screen / notification controls)
+  # The media surfaces (notification / lock screen / SMTC / MPRIS) and audio
+  # focus live in their own capability package now; this module uses them for
+  # music instead of owning a second implementation.
+  media_core_mediasession:
+    path: ../media_core_mediasession
+
+  audio_service: ^0.18.19
+
+  # Windows implementation of audio_service
+  audio_service_win: ^0.0.3
+
+  # Linux implementation of audio_service (MPRIS / D-Bus)
+  audio_service_mpris: ^0.2.1
+
+  # Audio focus / interruption / becoming-noisy events
+  audio_session: ^0.2.3
+
+  # Music downloads (HLS/adaptive sources, tag writing, codec choice).
+  # Pinned to the version the app resolves, so a single native ffmpeg build
+  # serves both packages.
+  ffmpeg_kit_extended_flutter: 0.6.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+# Native desktop-lyric overlay (Windows layered window / Android overlay
+# window). Declaring the platforms is what makes Flutter register the plugin
+# and build the native side; the Dart API stays usable everywhere - a platform
+# without the implementation reports "unsupported" through the transport.
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.mediacore.audio
+        pluginClass: MediaCoreAudioPlugin
+      windows:
+        pluginClass: MediaCoreAudioPluginCApi
+      macos:
+        pluginClass: MediaCoreAudioPlugin
+      linux:
+        pluginClass: MediaCoreAudioPlugin

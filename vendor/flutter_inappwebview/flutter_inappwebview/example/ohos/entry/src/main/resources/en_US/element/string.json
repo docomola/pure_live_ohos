@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "flutter_inappwebview_ohos_example"
+    },
+    {
+      "name": "camera_permission_reason",
+      "value": "Used for testing web camera permission requests"
+    },
+    {
+      "name": "microphone_permission_reason",
+      "value": "Used for testing web microphone permission requests"
+    },
+    {
+      "name": "location_permission_reason",
+      "value": "Used for testing web geolocation permission requests"
+    }
+  ]
+}

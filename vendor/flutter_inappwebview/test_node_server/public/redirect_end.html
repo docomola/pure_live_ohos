@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Page C (End)</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 40px; }
+        h1 { color: #4CAF50; }
+        .result { margin-top: 20px; padding: 20px; border-radius: 8px; }
+        .bug { background: #FFEBEE; color: #C62828; border: 2px solid #C62828; }
+        .ok { background: #E8F5E9; color: #2E7D32; border: 2px solid #2E7D32; }
+    </style>
+</head>
+<body>
+    <h1>Page C (End)</h1>
+    <p>You arrived here via 3 consecutive <code>window.location.replace()</code> redirects.</p>
+    <p>Chain: A → B1 → B2 → B3 → C</p>
+    <p>Now press the <strong>goBack</strong> button below.</p>
+    <div class="result bug">
+        <p><strong>If you see any B page after pressing goBack, there is a bug!</strong></p>
+        <p>The redirect loop means <code>location.replace()</code> did not properly replace the history entries.</p>
+    </div>
+    <div class="result ok">
+        <p><strong>If you see Page A after pressing goBack, the behavior is correct.</strong></p>
+        <p>All 3 intermediate pages (B1, B2, B3) were correctly skipped.</p>
+    </div>
+</body>
+</html>

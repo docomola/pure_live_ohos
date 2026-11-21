@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File URL Access Test</title>
+</head>
+<body>
+    <h2>File URL Access A/B Test</h2>
+    <p>allowFileAccessFromFileURLs = <b id="file-url-access-allow">loading...</b></p>
+    <p>image file URL: <span id="file-url-access-src">loading...</span></p>
+    <p id="file-url-access-status">IMG_LOADING</p>
+    <img id="file-url-access-image" width="120" height="120" alt="file url test image" style="background: #eee;">
+    <script>
+        window.setFileUrlAccessTestImage = function(imageUrl, allowFileAccessFromFileURLs) {
+            const allow = document.getElementById('file-url-access-allow');
+            const src = document.getElementById('file-url-access-src');
+            const status = document.getElementById('file-url-access-status');
+            const image = document.getElementById('file-url-access-image');
+            allow.innerText = allowFileAccessFromFileURLs;
+            src.innerText = imageUrl;
+            status.innerText = 'IMG_LOADING';
+            image.onload = function() {
+                status.innerText = 'IMG_OK';
+                console.log('file-url-access-image IMG_OK');
+            };
+            image.onerror = function() {
+                status.innerText = 'IMG_ERR';
+                console.log('file-url-access-image IMG_ERR');
+            };
+            image.src = imageUrl;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Page A (Start)</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 40px; }
+        h1 { color: #2196F3; }
+        a { display: inline-block; margin: 20px; padding: 15px 30px; background: #2196F3; color: white; text-decoration: none; border-radius: 8px; font-size: 18px; }
+        a:hover { background: #1976D2; }
+        .info { margin-top: 30px; padding: 15px; background: #E3F2FD; border-radius: 8px; color: #1565C0; }
+    </style>
+</head>
+<body>
+    <h1>Page A (Start)</h1>
+    <p>This is the starting page.</p>
+    <a href="redirect_b1.html">Go to Page B1 (will trigger 3 consecutive redirects to Page C)</a>
+    <div class="info">
+        <p><strong>Test steps:</strong></p>
+        <p>1. Click the link above → B1 → B2 → B3 → C (3 consecutive location.replace redirects)</p>
+        <p>2. On Page C, press the <strong>goBack</strong> button</p>
+        <p>3. If you return here (Page A) directly, the behavior is correct</p>
+        <p>4. If you land on any B page, there is a bug</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Page B (Redirecting...)</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 40px; }
+        h1 { color: #FF9800; }
+        .info { margin-top: 20px; padding: 15px; background: #FFF3E0; border-radius: 8px; color: #E65100; }
+    </style>
+</head>
+<body>
+    <h1>Page B (Redirecting...)</h1>
+    <p>This page will redirect to Page C immediately.</p>
+    <div class="info">
+        <p><code>window.location.replace('redirect_end.html')</code> is being called.</p>
+        <p><code>replace()</code> should NOT leave this page in the browser history.</p>
+    </div>
+    <script>
+        window.location.replace('redirect_end.html');
+    </script>
+</body>
+</html>

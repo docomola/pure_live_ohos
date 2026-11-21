@@ -1,0 +1,9 @@
+{
+  "name": "media_core_avplayer",
+  "version": "1.0.0",
+  "description": "HarmonyOS AVPlayer backend for media_core.",
+  "main": "index.ets",
+  "author": "",
+  "license": "AGPL-3.0",
+  "dependencies": {}
+}

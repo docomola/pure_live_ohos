@@ -1,0 +1,23 @@
+name: media_core_logging
+description: Levelled, categorised logging for media_core - one logger, per-module levels, pluggable sinks (console, memory, rotating file) and scoped fields.
+version: 0.1.0
+publish_to: none
+repository: https://github.com/liuchuancong/media_core
+issue_tracker: https://github.com/liuchuancong/media_core/issues
+resolution: workspace
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Log level and category value objects
+  equatable: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

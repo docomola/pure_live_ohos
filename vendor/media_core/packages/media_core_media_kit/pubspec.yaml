@@ -1,0 +1,38 @@
+name: media_core_media_kit
+description: >-
+  media_kit (libmpv) backend adapter for media_core: mpv-grade codec
+  coverage and desktop playback behind the shared PlayerAdapter contract.
+version: 0.1.0
+# Blocked from publishing: media_kit / media_kit_video are pinned to the
+# Predidit fork by commit (pub.dev forbids git deps in published packages).
+publish_to: none
+repository: https://github.com/liuchuancong/media_core
+issue_tracker: https://github.com/liuchuancong/media_core/issues
+resolution: workspace
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  media_core:
+    path: ../media_core
+  media_core_logging:
+    path: ../media_core_logging
+
+  # Upstream Predidit/media-kit, pinned. The repository no longer carries copies
+  # of these two packages: the fork patches described in pure_live's
+  # media_kit_video/PURELIVE_PATCH.md (Android Surface/vid ownership,
+  # setVideoOutputEnabled, Windows frameRevision) are NOT in this revision, so
+  # nothing here may depend on them. One source per dependency: the commit pin
+  # is authoritative, no hosted fallback is possible.
+  media_kit:
+    path: ../../../media_kit/media_kit
+
+  media_kit_video:
+    path: ../../../media_kit/media_kit_video
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

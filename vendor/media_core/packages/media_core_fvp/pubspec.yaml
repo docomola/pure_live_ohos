@@ -1,0 +1,31 @@
+name: media_core_fvp
+description: >-
+  fvp (libmdk) backend adapter for media_core: current FFmpeg, platform
+  hardware decoding and software fallbacks behind the shared PlayerAdapter
+  contract.
+version: 0.1.0
+publish_to: none
+repository: https://github.com/liuchuancong/media_core
+issue_tracker: https://github.com/liuchuancong/media_core/issues
+resolution: workspace
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  media_core:
+    path: ../media_core
+  media_core_logging:
+    path: ../media_core_logging
+
+  # Published package. Note that pure_live vendors a stripped copy (android/ios
+  # plugin platforms only) to keep libmdk off desktop; that copy is not used
+  # here, so desktop builds resolve the published plugin and its native
+  # dependency themselves.
+  fvp: ^0.38.1
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

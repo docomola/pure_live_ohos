@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS桥安全测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 16px; margin: 0; }
+        .test-section { margin: 16px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        .test-section h3 { margin-top: 0; color: #333; }
+        button { padding: 8px 16px; margin: 4px; border: none; border-radius: 4px; cursor: pointer; background: #2196F3; color: white; }
+        button:active { background: #1976D2; }
+        #log { background: #f5f5f5; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <p>测试内容: 使用 JSON.stringify 对 _callHandlerID 进行转义</p>
+
+    <div class="test-section">
+        <h3>测试1: 正常 callHandler 调用</h3>
+        <p>验证正常的 JavaScript 处理器通信是否正常工作。</p>
+        <button onclick="testNormalCallHandler()">运行测试1</button>
+    </div>
+
+    <div class="test-section">
+        <h3>测试2: 恶意 _callHandlerID 注入</h3>
+        <p>尝试通过构造恶意的 _callHandlerID 注入 JS 代码。应被安全转义。</p>
+        <button onclick="testMaliciousCallHandlerID()">运行测试2</button>
+    </div>
+
+    <div class="test-section">
+        <h3>测试3: _callHandlerID 中的特殊字符</h3>
+        <p>测试包含引号、反斜杠等特殊字符的 _callHandlerID。</p>
+        <button onclick="testSpecialCharsCallHandlerID()">运行测试3</button>
+    </div>
+
+    <div class="test-section">
+        <h3>测试4: callHandler 返回值</h3>
+        <p>验证 callHandler Promise 是否正确解析 Flutter 返回值。</p>
+        <button onclick="testCallHandlerReturnValue()">运行测试4</button>
+    </div>
+
+    <div class="test-section">
+        <h3>运行所有测试</h3>
+        <button onclick="runAllTests()">全部运行</button>
+    </div>
+
+    <h3>日志输出:</h3>
+    <div id="log"></div>
+
+    <script>
+        let injectionDetected = false;
+        let originalAlert = window.alert;
+        let originalFunction = window.Function;
+
+        window.alert = function(msg) {
+            if (msg && msg.toString().indexOf('INJECTION') !== -1) {
+                injectionDetected = true;
+                logMessage('!!! 检测到注入攻击: ' + msg, 'fail');
+            } else {
+                originalAlert.call(window, msg);
+            }
+        };
+
+        function logMessage(msg, cls) {
+            let logDiv = document.getElementById('log');
+            let span = document.createElement('span');
+            if (cls) {
+                span.className = cls;
+            }
+            span.textContent = msg + '\n';
+            logDiv.appendChild(span);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            injectionDetected = false;
+        }
+
+        async function testNormalCallHandler() {
+            clearLog();
+            logMessage('--- 测试1: 正常 callHandler 调用 ---');
+            try {
+                logMessage('检查 flutter_inappwebview 对象: ' + (window.flutter_inappwebview ? '存在' : '不存在'));
+                logMessage('检查 callHandler 函数: ' + (window.flutter_inappwebview?.callHandler ? '存在' : '不存在'));
+                
+                let result = await window.flutter_inappwebview.callHandler('securityTestHandler', 'hello');
+                logMessage('返回值类型: ' + typeof result);
+                logMessage('返回值原始值: ' + result);
+                logMessage('返回值 JSON: ' + JSON.stringify(result));
+                
+                let expected = 'echo:hello';
+                let actual = result;
+                
+                if (actual === expected) {
+                    logMessage('测试1 通过:  正常处理', 'pass');
+                } else {
+                    logMessage('测试1 失败: 期望 "' + expected + '", 实际得到 "' + result + '"', 'fail');
+                }
+            } catch (e) {
+                logMessage('测试1 失败，错误: ' + e, 'fail');
+            }
+        }
+
+        async function testMaliciousCallHandlerID() {
+            clearLog();
+            logMessage('--- 测试2: 恶意 _callHandlerID 注入 ---');
+            injectionDetected = false;
+
+            let maliciousIDs = [
+                ']; alert("INJECTION_XSS"); //',
+                ']; document.title="INJECTION"; //',
+                '1]; alert("INJECTION_SCRIPT"); let x=["1'
+            ];
+
+            let allPassed = true;
+            for (let i = 0; i < maliciousIDs.length; i++) {
+                let maliciousID = maliciousIDs[i];
+                logMessage('测试恶意ID: ' + JSON.stringify(maliciousID));
+
+                try {
+                    if (window.flutter_inappwebview && window.flutter_inappwebview._callHandler) {
+                        window.flutter_inappwebview._callHandler('securityTestHandler', maliciousID, JSON.stringify(['injection_test']));
+                    }
+                } catch (e) {
+                    logMessage('调用 _callHandler 出错: ' + e);
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                if (injectionDetected) {
+                    logMessage('测试2 失败: 检测到注入，ID: ' + maliciousID, 'fail');
+                    allPassed = false;
+                    injectionDetected = false;
+                } else {
+                    logMessage('此ID未检测到注入 (正常)', 'pass');
+                }
+            }
+
+            if (allPassed) {
+                logMessage('测试2 通过: 所有恶意ID均被安全转义', 'pass');
+            } else {
+                logMessage('测试2 失败: 部分注入未被阻止', 'fail');
+            }
+        }
+
+        async function testSpecialCharsCallHandlerID() {
+            clearLog();
+            logMessage('--- 测试3: _callHandlerID 中的特殊字符 ---');
+            injectionDetected = false;
+
+            let specialIDs = [
+                'test"quote',
+                "test'quote",
+                'test\\backslash',
+                'test\nnewline',
+                'test\ttab',
+                '{"key":"value"}',
+                '<script>alert("INJECTION")<\/script>'
+            ];
+
+            let allPassed = true;
+            for (let i = 0; i < specialIDs.length; i++) {
+                let specialID = specialIDs[i];
+                logMessage('测试特殊字符ID: ' + JSON.stringify(specialID));
+
+                try {
+                    if (window.flutter_inappwebview && window.flutter_inappwebview._callHandler) {
+                        window.flutter_inappwebview._callHandler('securityTestHandler', specialID, JSON.stringify(['special_test']));
+                    }
+                } catch (e) {
+                    logMessage('调用 _callHandler 出错: ' + e);
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                if (injectionDetected) {
+                    logMessage('测试3 失败: 检测到注入，ID: ' + JSON.stringify(specialID), 'fail');
+                    allPassed = false;
+                    injectionDetected = false;
+                } else {
+                    logMessage('此ID未检测到注入 (正常)', 'pass');
+                }
+            }
+
+            if (allPassed) {
+                logMessage('测试3 通过: 所有特殊字符ID均被安全处理', 'pass');
+            } else {
+                logMessage('测试3 失败: 部分特殊字符ID导致注入', 'fail');
+            }
+        }
+
+        async function testCallHandlerReturnValue() {
+            clearLog();
+            logMessage('--- 测试4: callHandler 返回值 ---');
+            try {
+                logMessage('检查 flutter_inappwebview 对象: ' + (window.flutter_inappwebview ? '存在' : '不存在'));
+                logMessage('检查 callHandler 函数: ' + (window.flutter_inappwebview?.callHandler ? '存在' : '不存在'));
+                
+                let result = await window.flutter_inappwebview.callHandler('securityTestHandler', 'world');
+                logMessage('返回值类型: ' + typeof result);
+                logMessage('返回值原始值: ' + result);
+                logMessage('返回值 JSON: ' + JSON.stringify(result));
+                
+                let expected = 'echo:world';
+                let actual = result;
+                
+                if (actual === expected) {
+                    logMessage('测试4 通过: callHandler Promise 解析正确', 'pass');
+                } else {
+                    logMessage('测试4 失败: 期望 "' + expected + '", 实际得到 "' + result + '"', 'fail');
+                }
+            } catch (e) {
+                logMessage('测试4 失败，错误: ' + e, 'fail');
+                logMessage('错误类型: ' + e.name);
+                logMessage('错误堆栈: ' + e.stack);
+            }
+        }
+
+        async function runAllTests() {
+            clearLog();
+            logMessage('========== 运行所有测试 ==========');
+            await testNormalCallHandler();
+            await new Promise(r => setTimeout(r, 300));
+            await testMaliciousCallHandlerID();
+            await new Promise(r => setTimeout(r, 300));
+            await testSpecialCharsCallHandlerID();
+            await new Promise(r => setTimeout(r, 300));
+            await testCallHandlerReturnValue();
+            logMessage('========== 所有测试完成 ==========');
+        }
+    </script>
+</body>
+</html>

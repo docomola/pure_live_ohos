@@ -1,0 +1,81 @@
+name: media_core
+
+description: >-
+  Platform-neutral core of a composable Flutter media player: one
+  PlayerAdapter contract for engine backends, plus orchestration, registry,
+  fallback, events and diagnostics.
+version: 0.1.0
+publish_to: none
+repository: https://github.com/liuchuancong/media_core
+issue_tracker: https://github.com/liuchuancong/media_core/issues
+
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Reactive
+  rxdart: ^0.28.0
+
+  # Levelled, categorised logging
+  media_core_logging:
+    path: ../media_core_logging
+
+  # Memory accounting and pressure
+  media_core_memory:
+    path: ../media_core_memory
+
+  # Value equality
+  equatable: ^3.0.0
+
+  # Immutable models / JSON
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.12.0
+
+  # Collections
+  collection: ^1.19.1
+
+  # Metadata annotations
+  meta: ^1.19.0
+
+  # MIME
+  mime: ^2.1.0
+
+  # Async primitives
+  async: ^2.13.1
+
+  # Danmaku similarity scoring
+  fuzzywuzzy: ^1.1.6
+
+  # Testable time
+  clock: ^1.1.3
+
+  # Path
+  path: ^1.9.1
+  pool: ^1.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  test: ^1.26.2
+
+  # Code generation
+  build_runner: ^2.7.0
+  freezed: ^4.0.1
+  json_serializable: ^6.11.1
+
+  # Mocking
+  mocktail: ^1.0.4
+
+  # Deterministic async/time tests
+  fake_async: ^1.3.3
+
+  # Lint
+  flutter_lints: ^6.0.0

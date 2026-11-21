@@ -1,0 +1,28 @@
+name: media_core_native_example
+description: Shows what the platform probe reports on this device.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The plugin under test.
+  media_core_native:
+    path: ..
+
+  # The vocabulary the report is expressed in.
+  media_core:
+    path: ../../media_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

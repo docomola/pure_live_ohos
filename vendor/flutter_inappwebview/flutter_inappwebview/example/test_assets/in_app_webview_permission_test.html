@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>InAppWebView Permission Test</title>
+        <style>
+            body { font-family: sans-serif; padding: 20px; }
+            h1 { font-size: 18px; }
+            button { display: block; margin: 10px 0; padding: 12px 24px; font-size: 16px; width: 100%; max-width: 300px; }
+            .result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; min-height: 40px; }
+            .success { color: green; }
+            .error { color: red; }
+        </style>
+    </head>
+    <body>
+        <h1>WebView Permission Test</h1>
+        <button id="camera" onclick="requestCamera()">Request Camera</button>
+        <button id="microphone" onclick="requestMicrophone()">Request Microphone</button>
+        <button id="camera_and_microphone" onclick="requestCameraAndMicrophone()">Request Camera & Microphone</button>
+        <div class="result" id="result"></div>
+        <script>
+            function showResult(msg, isError) {
+                let result = document.getElementById('result');
+                result.innerHTML = '<span class="' + (isError ? 'error' : 'success') + '">' + msg + '</span>';
+            }
+
+            function requestCamera() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showResult('getUserMedia not supported or not in secure context', true);
+                    return;
+                }
+                showResult('Requesting camera permission...', false);
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        stream.getTracks().forEach(function(track) { track.stop() });
+                        showResult('Camera permission GRANTED', false);
+                    })
+                    .catch(function(err) {
+                        showResult('Camera permission DENIED: ' + err.name, true);
+                    });
+            }
+
+            function requestMicrophone() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showResult('getUserMedia not supported or not in secure context', true);
+                    return;
+                }
+                showResult('Requesting microphone permission...', false);
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function(stream) {
+                        stream.getTracks().forEach(function(track) { track.stop() });
+                        showResult('Microphone permission GRANTED', false);
+                    })
+                    .catch(function(err) {
+                        showResult('Microphone permission DENIED: ' + err.name, true);
+                    });
+            }
+
+            function requestCameraAndMicrophone() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showResult('getUserMedia not supported or not in secure context', true);
+                    return;
+                }
+                showResult('Requesting camera & microphone permission...', false);
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                    .then(function(stream) {
+                        stream.getTracks().forEach(function(track) { track.stop() });
+                        showResult('Camera & Microphone permission GRANTED', false);
+                    })
+                    .catch(function(err) {
+                        showResult('Camera & Microphone permission DENIED: ' + err.name, true);
+                    });
+            }
+        </script>
+    </body>
+</html>

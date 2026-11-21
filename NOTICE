@@ -1,0 +1,52 @@
+Pure Live — HarmonyOS NEXT Edition
+==================================
+
+This project is a derivative work of "pure_live" by liuchuancong.
+
+  Upstream project : https://github.com/liuchuancong/pure_live
+  Upstream author  : liuchuancong
+  Original license : GNU Affero General Public License v3.0 (AGPL-3.0)
+  This edition     : HarmonyOS NEXT (Ohos) port, including the AVPlayer
+                     playback backend and local vendored plugin forks.
+
+Modifications in this edition
+-----------------------------
+This fork adds HarmonyOS NEXT support to the upstream Flutter application.
+The changes are distributed under the same AGPL-3.0 license, per section 5
+and section 13 of the license.
+
+  1. HarmonyOS application shell (ohos/) built on Flutter-OH, using
+     FlutterAbility + FlutterPage embedding.
+  2. New playback backend "media_core_avplayer" (vendor/media_core_avplayer),
+     which drives the native @ohos.multimedia.media AVPlayer and renders
+     decoded frames through Flutter's external texture API. This backend is
+     selected instead of the upstream libmpv/media-kit backend on Ohos.
+  3. Local forks of upstream/third-party Flutter plugins patched for Ohos,
+     vendored under vendor/ so the port is reproducible:
+       - media_core       (fork of https://github.com/liuchuancong/media_core)
+       - media_kit        (fork of https://github.com/Predidit/media-kit)
+       - flutter_inappwebview (fork of openharmony-sig)
+       - flutter_packages (path_provider / shared_preferences Ohos patches)
+     Each vendored component keeps its own LICENSE file.
+  4. Adaptations to connectivity detection, player facade backend selection
+     and related controllers for the Ohos target (see git history).
+
+All trademarks, project names and artwork remain the property of their
+respective owners. This is an independent, community port and is not
+affiliated with or endorsed by the upstream author.
+
+License
+-------
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
+for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program (see the LICENSE file). If not, see
+<https://www.gnu.org/licenses/>.

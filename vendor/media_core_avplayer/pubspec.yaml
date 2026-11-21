@@ -1,0 +1,27 @@
+name: media_core_avplayer
+description: >-
+  HarmonyOS AVPlayer backend for media_core. Decodes through the system media
+  engine and renders into a Flutter external texture, so the platform has no
+  libmpv requirement and Flutter overlays composite normally on top of video.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  media_core:
+    path: ../media_core/packages/media_core
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      ohos:
+        package: com.purelive.media_core_avplayer
+        pluginClass: AvPlayerPlugin

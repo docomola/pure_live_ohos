@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Async POST (fetch) Test</title>
+    <style>
+        body {
+            font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 16px;
+            word-break: break-word;
+        }
+        h2 { margin-top: 0; }
+        button {
+            padding: 10px 18px;
+            font-size: 16px;
+            background: #0175C2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+        }
+        button:disabled { background: #9aa0a6; }
+        pre {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-size: 13px;
+        }
+        #status { color: #555; font-size: 13px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <h2>Async POST (fetch) Test</h2>
+    <p>Calls the MDN-style <code>async function post(url, data)</code> below.</p>
+
+    <button id='post-btn'>Send POST request</button>
+
+    <p id='status'>Idle. Tap the button to send.</p>
+    <pre id='result'>Result will appear here...</pre>
+
+    <script>
+        // The async POST method shown in the image (MDN fetch() example).
+        async function post(url = '', data = {}) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        }
+
+        const btn = document.getElementById('post-btn');
+        const statusEl = document.getElementById('status');
+        const resultEl = document.getElementById('result');
+
+        btn.addEventListener('click', async function () {
+            btn.disabled = true;
+            statusEl.innerText = 'Sending POST...';
+            resultEl.innerText = '';
+            console.log('post button clicked');
+
+            try {
+                // The call at the bottom of the image.
+                const data = await post('https://postman-echo.com/post', { name: '主银', value: 42 });
+                console.log('post response:', data);
+                statusEl.innerText = 'Done. See console + result below.';
+                resultEl.innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                console.log('post error:', err);
+                statusEl.innerText = 'Error: ' + err.message;
+                resultEl.innerText = String(err);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

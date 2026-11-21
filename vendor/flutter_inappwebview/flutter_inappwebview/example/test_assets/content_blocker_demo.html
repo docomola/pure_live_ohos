@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Blocker Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 16px; line-height: 1.5; }
+    section { margin-bottom: 24px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
+    h2 { margin-top: 0; font-size: 1.1rem; }
+    .ad-banner {
+      background: #ffeb3b;
+      padding: 16px;
+      text-align: center;
+      font-weight: bold;
+    }
+    img { max-width: 100%; height: auto; margin-top: 8px; border: 1px solid #ddd; }
+    .ok { color: #2e7d32; font-weight: bold; }
+    .fail { color: #c62828; font-weight: bold; }
+    .hint { color: #666; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>Content Blocker 演示页</h1>
+  <p>切换 Flutter 顶部三个开关并等待 WebView 重建后观察各节。</p>
+
+  <section id="section-block">
+    <h2>1. BLOCK — 拦截图片</h2>
+    <p class="hint">本地 <code>images/flutter-logo.png</code>，不依赖外网。</p>
+    <img id="flutter-logo-image" alt="block demo"
+         src="images/flutter-logo.png"
+         height="60"
+         width="60"
+         onload="window.__onBlockImgLoad && window.__onBlockImgLoad(true)"
+         onerror="window.__onBlockImgLoad && window.__onBlockImgLoad(false)">
+    <p id="block-status">等待加载…</p>
+    <p class="hint">预期：<b>BLOCK 开</b> → 看不到图；<b>关</b> → 可见彩色 logo。</p>
+  </section>
+
+  <section id="section-css">
+    <h2>2. CSS_DISPLAY_NONE — 隐藏广告条</h2>
+    <p>规则匹配 <code>.ad-banner</code> 时，黄色区域应不可见：</p>
+    <div class="ad-banner">这是模拟广告 (.ad-banner)</div>
+  </section>
+
+  <section id="section-https">
+    <h2>3. MAKE_HTTPS — HTTP 升级</h2>
+    <p class="hint">通过 <code>http://</code> 加载百度 favicon（需 MAKE_HTTPS 升级为 https）。</p>
+    <img id="http-image" alt="http favicon"
+         src="http://www.baidu.com/favicon.ico"
+         onload="window.__onHttpsImgLoad && window.__onHttpsImgLoad(true)"
+         onerror="window.__onHttpsImgLoad && window.__onHttpsImgLoad(false)">
+    <p id="https-status">等待加载…</p>
+    <p class="hint">预期：<b>MAKE_HTTPS 开</b> → 图片可见；<b>关</b> → 往往失败（系统限制明文 HTTP）。</p>
+  </section>
+
+  <script>
+    window.__onBlockImgLoad = function (loaded) {
+      let el = document.getElementById('block-status');
+      if (!el) {
+	    return;
+	  }
+      if (loaded) {
+        el.textContent = '图片已正常加载（BLOCK 应处于关闭状态）';
+        el.className = 'ok';
+      } else {
+        el.textContent = '图片未显示：已被 Content Blocker 拦截';
+        el.className = 'fail';
+      }
+    };
+    window.__onHttpsImgLoad = function (loaded) {
+      let el = document.getElementById('https-status');
+      if (!el) {
+	    return;
+	  }
+      if (loaded) {
+        el.textContent = 'HTTP 资源已加载（MAKE_HTTPS 已升级为 HTTPS）';
+        el.className = 'ok';
+      } else {
+        el.textContent = 'HTTP 资源加载失败（请开启 MAKE_HTTPS，或检查网络）';
+        el.className = 'fail';
+      }
+    };
+  </script>
+</body>
+</html>

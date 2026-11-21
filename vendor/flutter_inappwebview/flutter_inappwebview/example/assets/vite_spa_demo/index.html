@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vite SPA via CustomPathHandler</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    #app { padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+    #logo { margin-top: 12px; border: 1px dashed #999; }
+    .hint { color: #666; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>CustomPathHandler · Vite-like SPA</h1>
+  <p class="hint">模拟 Vite 产物：ES module 脚本 + SVG 图片，经 WebViewAssetLoader 加载。</p>
+  <div id="app">Loading module…</div>
+  <img id="logo" src="./assets/logo-demo.svg" alt="logo" width="96" height="96">
+  <script type="module" src="./assets/index-a1b2c3.js"></script>
+</body>
+</html>

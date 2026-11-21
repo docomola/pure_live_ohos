@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "模块描述"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "flutter_inappwebview_ohos_example"
+    },
+    {
+      "name": "camera_permission_reason",
+      "value": "用于测试网页摄像头权限请求"
+    },
+    {
+      "name": "microphone_permission_reason",
+      "value": "用于测试网页麦克风权限请求"
+    },
+    {
+      "name": "location_permission_reason",
+      "value": "用于测试网页地理位置权限请求"
+    }
+  ]
+}
