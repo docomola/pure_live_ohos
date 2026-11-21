@@ -11,7 +11,7 @@ class NavigationSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final allMenus = [HomeMenu.favorites, HomeMenu.popular, HomeMenu.areas, HomeMenu.record];
+    final allMenus = [HomeMenu.popular, HomeMenu.areas, HomeMenu.favorites, HomeMenu.record];
 
     return Scaffold(
       appBar: AppBar(title: Text(i18n("navigation_display_settings"))),

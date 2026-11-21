@@ -3,9 +3,11 @@ import 'package:pure_live/get/get.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 
 enum HomeMenu {
-  favorites('favorites'),
+  // 鸿蒙版默认把热门放第一位；声明顺序即底部导航默认顺序，改这里会同时
+  // 影响 savedMenuIds 的初始值与 HomeMenu.index（页面映射按枚举键走，安全）。
   popular('popular'),
   areas('areas'),
+  favorites('favorites'),
   record('record');
 
   final String id;

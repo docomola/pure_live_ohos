@@ -182,10 +182,13 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin,
       activeIds = activeIds.where((id) => id != HomeMenu.record.id).toList();
     }
     if (activeIds.isNotEmpty) {
-      final firstMenu = HomeMenu.fromId(activeIds.first);
-      if (firstMenu != null) {
-        _selectedIndex = firstMenu.index;
-        favoriteController.tabBottomIndex.value = firstMenu.index;
+      // 冷启动固定落在热门；只有用户把热门入口隐藏了才退回列表第一项。
+      final initialMenu = HomeMenu.fromId(
+        activeIds.contains(HomeMenu.popular.id) ? HomeMenu.popular.id : activeIds.first,
+      );
+      if (initialMenu != null) {
+        _selectedIndex = initialMenu.index;
+        favoriteController.tabBottomIndex.value = initialMenu.index;
       }
     }
   }

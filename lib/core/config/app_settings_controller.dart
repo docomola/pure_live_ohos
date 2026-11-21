@@ -55,6 +55,10 @@ class AppSettingsController extends GetxController {
   final RxBool preferRealOnlineCounts = hiveBool('preferRealOnlineCounts', false);
   late final RxList<String> realOnlinePlatforms = hiveStringList('realOnlinePlatforms', defaultRealOnlinePlatforms);
   final RxInt audienceMetricMigration = hiveInt('audienceMetricMigration', 0);
+  // 鸿蒙版把默认底部导航顺序改为 热门→分区→关注→录制。旧版本安装里
+  // Hive 已存了旧顺序，这里只升级"仍是旧默认排列"的安装；用户自己拖过
+  // 顺序就不动，避免覆盖其设置。
+  final RxInt menuOrderMigration = hiveInt('menuOrderMigration', 0);
   // These entry points existed before they became configurable upstream.
   // Defaulting missing keys to true keeps upgrades feature-compatible while
   // still allowing users to hide either entry explicitly.
@@ -74,6 +78,13 @@ class AppSettingsController extends GetxController {
     super.onInit();
     final normalizedMenus = normalizeMenuIds(savedMenuIds.v);
     if (!listEquals(savedMenuIds.v, normalizedMenus)) savedMenuIds.v = normalizedMenus;
+    if (menuOrderMigration.v < 1) {
+      const legacyDefaultOrder = ['favorites', 'popular', 'areas', 'record'];
+      if (listEquals(savedMenuIds.v, legacyDefaultOrder)) {
+        savedMenuIds.v = HomeMenu.values.map((menu) => menu.id).toList();
+      }
+      menuOrderMigration.v = 1;
+    }
     if (audienceMetricMigration.v < 1) {
       if (!realOnlinePlatforms.contains('twitch')) realOnlinePlatforms.add('twitch');
       audienceMetricMigration.v = 1;
@@ -150,7 +161,7 @@ class AppSettingsController extends GetxController {
       final id = rawId.trim().toLowerCase();
       if (supported.contains(id) && !normalized.contains(id)) normalized.add(id);
     }
-    return normalized.isEmpty ? [HomeMenu.favorites.id] : normalized;
+    return normalized.isEmpty ? [HomeMenu.popular.id] : normalized;
   }
 
   @override

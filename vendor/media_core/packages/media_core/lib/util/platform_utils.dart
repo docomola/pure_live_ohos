@@ -15,6 +15,14 @@ abstract final class PlatformUtils {
     return Platform.isIOS;
   }
 
+  /// Whether running on HarmonyOS / OpenHarmony.
+  ///
+  /// Flutter-OH 在 dart:io 上把系统标识暴露为 'ohos'；不用 Platform.isOhos
+  /// 是因为官方 Flutter SDK 没有该 getter，会导致编译失败。
+  static bool get isOhos {
+    return Platform.operatingSystem == 'ohos';
+  }
+
   /// Whether running on Windows.
   static bool get isWindows {
     return Platform.isWindows;
@@ -42,7 +50,9 @@ abstract final class PlatformUtils {
 
   /// Whether running on mobile.
   static bool get isMobile {
-    return isAndroid || isIOS;
+    // HarmonyOS 也是移动端：FullscreenDriver 靠这个值选择 mobile 分支，
+    // 漏掉 ohos 会让全屏判定为 unsupported 并抛异常，方向设置随之被跳过。
+    return isAndroid || isIOS || isOhos;
   }
 
   /// Whether running on TV-like platform.
@@ -61,6 +71,10 @@ abstract final class PlatformUtils {
 
     if (isIOS) {
       return 'ios';
+    }
+
+    if (isOhos) {
+      return 'ohos';
     }
 
     if (isWindows) {

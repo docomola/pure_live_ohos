@@ -6,6 +6,7 @@ import 'iptv_programme_policy.dart';
 
 import 'package:flutter/scheduler.dart';
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/platform_utils.dart' as pure_platform;
 import 'package:media_core/media_core.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flame_barrage/flame_barrage.dart';
@@ -1449,16 +1450,24 @@ class VideoController with ChangeNotifier implements DanmakuSettingsSource, Play
   }
 
   Future<void> enterFullScreen({bool forceLandscape = false}) async {
-    final isMobile = Platform.isAndroid || Platform.isIOS;
+    // HarmonyOS 也是移动端：方向锁与退出回竖屏都要参与，否则点全屏只进
+    // 沉浸模式而不旋转（WindowService 已按 PlatformUtils.isMobile 处理 ohos）。
+    final isMobile = pure_platform.PlatformUtils.isMobile;
     _fullscreenOrientationRestore.begin(restorePortraitOnExit: isMobile && forceLandscape);
-    await WindowService().doEnterFullScreen();
+    // 沉浸式切换失败（例如内核未注册对应平台驱动）不应连带吞掉方向锁：
+    // 布局已经切进全屏，方向不转正是用户看到"点全屏不横屏"的直接原因。
+    try {
+      await WindowService().doEnterFullScreen();
+    } catch (error, stackTrace) {
+      log('enterFullScreen: system fullscreen failed', name: 'VideoController', error: error, stackTrace: stackTrace);
+    }
     GlobalPlayerService.instance.player.isSystemFullscreen.value = true;
 
     // Desktop full screen is already handled by window_manager above. Calling
     // landScape there issued a second setFullScreen(true) while the first
     // native transition was still running, producing inconsistent work-area
     // bounds on Windows systems with a side taskbar.
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (pure_platform.PlatformUtils.isMobile) {
       if (forceLandscape) {
         await WindowService().landScape();
       } else {
@@ -1549,7 +1558,7 @@ class VideoController with ChangeNotifier implements DanmakuSettingsSource, Play
   Future<void> applyFullscreenOrientationPolicy() async {
     if (_isDisposed ||
         !GlobalPlayerService.instance.player.isSystemFullscreen.value ||
-        !(Platform.isAndroid || Platform.isIOS)) {
+        !pure_platform.PlatformUtils.isMobile) {
       return;
     }
     if (_livePlayController.state.value.ui.screenMode == VideoMode.portraitFullscreen) {

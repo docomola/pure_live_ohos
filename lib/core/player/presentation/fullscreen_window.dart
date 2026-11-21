@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:media_core/media_core.dart';
 import 'package:media_core_fullscreen/media_core_fullscreen.dart';
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/platform_utils.dart' as pure_platform;
 import 'package:pure_live/core/player/kernel/player_kernel_service.dart';
 
 @visibleForTesting
@@ -71,6 +72,10 @@ class WindowService {
   WindowService._internal();
 
   bool _canApplyMobileOrientationLock() {
+    // 鸿蒙不走 Android 那套"平板不锁方向"的尺寸豁免：Flutter-OH 的
+    // Display.size 语义与官方 SDK 不一致（可能直接给物理像素），拿来判
+    // 手机/平板会误杀手机全屏；而点全屏本身就是显式意图，直接放行。
+    if (pure_platform.PlatformUtils.isOhos) return true;
     if (!Platform.isAndroid) return true;
     final views = WidgetsBinding.instance.platformDispatcher.views;
     if (views.isEmpty) return true;
@@ -87,8 +92,16 @@ class WindowService {
     try {
       if (kIsWeb) {
         await document.documentElement?.requestFullscreen();
-      } else if (Platform.isAndroid || Platform.isIOS) {
+      } else if (pure_platform.PlatformUtils.isMobile) {
         if (!_canApplyMobileOrientationLock()) return;
+        if (pure_platform.PlatformUtils.isOhos) {
+          // 鸿蒙的方向解码是位掩码（见 Flutter-OH PlatformChannel.decodeOrientations）：
+          //   [landscapeLeft]              → 0x08 → window.Orientation.LANDSCAPE（强制横屏）
+          //   [landscapeLeft, right]       → 0x0a → AUTO_ROTATION_LANDSCAPE（受系统"自动旋转"开关约束）
+          // 全屏按钮必须无条件横屏，所以这里只传一个方向，拿强制 LANDSCAPE。
+          await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+          return;
+        }
         await SystemChrome.setPreferredOrientations([
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.landscapeRight,
@@ -108,7 +121,7 @@ class WindowService {
   }
 
   Future<void> followSystemOrientation() async {
-    if (!(Platform.isAndroid || Platform.isIOS)) return;
+    if (!pure_platform.PlatformUtils.isMobile) return;
     await SystemChrome.setPreferredOrientations(const <DeviceOrientation>[]);
   }
 
@@ -123,7 +136,7 @@ class WindowService {
 
   Future<void> doExitFullScreen() async {
     try {
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      if (!kIsWeb && pure_platform.PlatformUtils.isMobile) {
         // Host-owned policy on mobile: the status bar styling and the
         // orientation restore are this app's theming and orientation rules.
         // The system UI mode itself is restored by the driver below.
