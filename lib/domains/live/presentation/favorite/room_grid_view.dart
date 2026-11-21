@@ -1,5 +1,6 @@
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/glass_nav_bar.dart';
 import 'package:pure_live/core/platform/platform_utils.dart';
 import 'package:pure_live/domains/live/presentation/favorite/favorite_controller.dart';
 import 'package:pure_live/domains/live/presentation/widgets/room_card.dart';
@@ -67,7 +68,12 @@ class RoomGridView extends GetView<FavoriteController> {
 
             final itemWidth = (width - 24 - spacing * (crossAxisCount - 1)) / crossAxisCount;
             return GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              padding: EdgeInsets.only(
+                left: 12,
+                right: 12,
+                top: 12,
+                bottom: 12 + GlassNavBar.contentInset,
+              ),
               controller: scrollController,
               physics: physics,
               scrollCacheExtent: ScrollCacheExtent.pixels(width > 680 ? 480 : 320),

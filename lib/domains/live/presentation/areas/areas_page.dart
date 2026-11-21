@@ -2,6 +2,7 @@ import 'areas_grid_view.dart';
 
 import 'package:remixicon/remixicon.dart';
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/glass_nav_bar.dart';
 import 'package:pure_live/core/widgets/common_appbar_actions.dart';
 import 'package:pure_live/domains/live/presentation/areas/areas_controller.dart';
 import 'package:pure_live/domains/live/data/platforms/sites.dart';
@@ -43,7 +44,12 @@ class AreasPage extends GetView<AreasController> {
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             floatingActionButton: Padding(
-              padding: EdgeInsets.only(bottom: Get.width > 680 ? 24 : 0, right: 0),
+              // 鸿蒙走原生悬浮底栏：这颗「关注分区」按钮必须抬到胶囊之上，
+              // 否则会和玻璃叠在一起，压住导航文字。
+              padding: EdgeInsets.only(
+                bottom: Get.width > 680 ? 24 : (GlassNavBar.isSupported ? GlassNavBar.contentInset : 0),
+                right: 0,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),

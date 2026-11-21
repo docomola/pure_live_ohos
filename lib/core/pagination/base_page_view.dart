@@ -1,5 +1,6 @@
 import 'package:pure_live/core/widgets/refresh_indicators.dart';
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/glass_nav_bar.dart';
 import 'package:pure_live/core/pagination/base_controller.dart';
 import 'package:pure_live/core/platform/platform_utils.dart';
 
@@ -57,6 +58,8 @@ class BasePageView<C extends BasePageScrollAndStateBone<T>, T> extends Stateless
     final bool isDesktop = currentWidth > 680 && !PlatformUtils.isMobile;
 
     double bottomPadding = isDesktop ? (customDesktopBottomPadding ?? 70) : (customMobileBottomPadding ?? 20);
+    // 鸿蒙的原生沉浸光感底栏浮在页面之上，悬浮按钮（回到顶部等）要抬到胶囊上方。
+    if (GlassNavBar.isSupported) bottomPadding += GlassNavBar.contentInset;
 
     return LayoutBuilder(
       builder: (context, pageConstraints) => Stack(

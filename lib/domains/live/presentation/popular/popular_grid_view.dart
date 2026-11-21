@@ -1,6 +1,7 @@
 import 'package:remixicon/remixicon.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/glass_nav_bar.dart';
 import 'package:pure_live/domains/live/presentation/widgets/room_card.dart';
 
 class PopularGridView extends StatelessWidget {
@@ -41,7 +42,12 @@ class PopularGridView extends StatelessWidget {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               slivers: [
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  padding: EdgeInsets.only(
+                    left: 6,
+                    right: 6,
+                    top: 6,
+                    bottom: 6 + GlassNavBar.contentInset,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, row) => Padding(

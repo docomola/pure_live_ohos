@@ -13,9 +13,27 @@ import 'package:pure_live/domains/live/presentation/playback/widgets/layout/live
 import 'package:pure_live/domains/live/domain/global_player_service.dart';
 
 class LiveRouteObserver extends RouteObserver<PageRoute<dynamic>> {
+  /// 是否处于沉浸式播放页（全屏视频）。
+  ///
+  /// 鸿蒙原生底栏是画在 Flutter 画面之上的一层 ArkTS，它看不到 Flutter 的路由，
+  /// 必须由这里告诉它。只有真正的全屏播放入口才让底栏让位 —— 普通页面（含四个
+  /// 页签之间的切换）一律常驻，不能因为压了任何一条路由就收起。
+  static final ValueNotifier<bool> homeCovered = ValueNotifier<bool>(false);
+
+  static const Set<String> _immersiveRoutes = <String>{
+    RoutePath.kLivePlay,
+    RoutePath.kMultiview,
+    RoutePath.kLocalVideoPlayer,
+  };
+
+  static void _setImmersiveRoute(bool immersive) {
+    if (homeCovered.value != immersive) homeCovered.value = immersive;
+  }
+
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
+    if (_immersiveRoutes.contains(route.settings.name)) _setImmersiveRoute(true);
     switch (route.settings.name) {
       case RoutePath.kLivePlay:
         _onLivePlayEnter();
@@ -33,6 +51,7 @@ class LiveRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
+    if (_immersiveRoutes.contains(route.settings.name)) _setImmersiveRoute(false);
     switch (route.settings.name) {
       case RoutePath.kLivePlay:
         _onLivePlayExit(route);

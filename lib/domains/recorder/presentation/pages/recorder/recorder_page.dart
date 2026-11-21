@@ -1,5 +1,6 @@
 import 'package:remixicon/remixicon.dart';
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/glass_nav_bar.dart';
 import 'package:pure_live/core/network/image_cache_manager.dart';
 import 'package:pure_live/core/utils/live_quality_label.dart';
 import 'package:pure_live/domains/recorder/domain/models/record_status.dart';
@@ -95,6 +96,7 @@ class _TaskList extends GetView<RecorderController> {
       }
 
       return RecorderBoundedTaskList(
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 24 + GlassNavBar.contentInset),
         itemCount: list.length,
         itemBuilder: (_, i) {
           return _TaskCard(key: ValueKey(list[i].taskId), task: list[i]);

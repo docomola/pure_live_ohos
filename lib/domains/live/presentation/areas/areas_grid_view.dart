@@ -1,5 +1,6 @@
 import 'package:remixicon/remixicon.dart';
 import 'package:pure_live/core/index.dart';
+import 'package:pure_live/core/platform/glass_nav_bar.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:pure_live/domains/live/presentation/areas/area_card.dart';
 import 'package:pure_live/domains/live/presentation/areas/areas_list_controller.dart';
@@ -282,7 +283,7 @@ class _AreaGridViewState extends State<AreaGridView> with TickerProviderStateMix
 
         return GridView.builder(
           key: scrollKey,
-          padding: const EdgeInsets.fromLTRB(6, 6, 6, 80),
+          padding: EdgeInsets.fromLTRB(6, 6, 6, 80 + GlassNavBar.contentInset),
           controller: scrollController,
           scrollCacheExtent: ScrollCacheExtent.pixels(width > 680 ? 480 : 320),
           addAutomaticKeepAlives: false,
