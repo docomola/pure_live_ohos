@@ -74,16 +74,29 @@ vendor/
 
 `tool/env.sh` 用 `${VAR:-默认值}` 的形式，覆盖 `FLUTTER_OHOS_ROOT` / `DEVECO_SDK_HOME` / `JAVA_HOME` / `ohpmBin` 等路径。`tool/build_hap.sh` 清理了宿主环境注入的 `NODE_OPTIONS` 和 sandbox shim（它们会让 hvigor 的临时清理超时），一条命令出 HAP。
 
+### 6. 原生悬浮底栏（HDS 沉浸光感）
+
+底部导航不是 Flutter 画的，而是 ArkTS 组件 `GlassNavBar` 叠在 Flutter 画面之上：
+
+- 材质走官方 `@kit.UIDesignKit` 的 `HdsTabs` + `barFloatingStyle.systemMaterialEffect`（`IMMERSIVE` + `EXQUISITE`）。SDK 里 `systemMaterialEffect` 只挂在 `TitleBarStyleOptions` 和 `HdsTabsFloatingStyle` 两个宿主上，手调 `backgroundEffect` 或半透明色块都拿不到材质流光与按压点光源。
+- `HdsTabs` 只承担页签栏，`TabContent` 内容层是空 `Stack` 并加 `hitTestBehavior(HitTestMode.None)`，触摸继续落到下层 Flutter；`.scrollable(false)` 不抢列表手势。
+- 栏目清单、选中项、显隐由 Dart 侧通过 MethodChannel（`pure_live/glass_nav`）下推，点击回传同一个通道，ArkTS 用 `AppStorage` / `@StorageLink` 驱动渲染。
+- `FlutterPage` 必须用 `XComponentType.TEXTURE` 合成：SURFACE 型 `XComponent` 是独立原生图层，Flutter 重新布局后会压到 ArkUI 之上，底栏会被吃掉。
+
+Dart 侧的桥在 `lib/core/platform/glass_nav_bar.dart`，各列表页在末尾补 `GlassNavBar.contentInset`，让内容能滚到胶囊底下穿过。
+
 ## 安装
 
-从 [Releases](https://github.com/docomola/pure_live_ohos/releases) 下载 `.hap`（**debug 签名**，需开启开发者模式）：
+从 [Releases](https://github.com/docomola/pure_live_ohos/releases) 下载最新的 `pure_live_ohos-*.hap`（**debug 签名**，需开启开发者模式）：
 
 ```bash
-hdc install -r pure_live_ohos.hap
+hdc install -r pure_live_ohos-1.1.0.hap
 hdc shell aa start -b com.purelive.pure_live -a EntryAbility
 ```
 
 > debug 签名 HAP 仅供开发测试，不能上架应用市场。做正式发布需要换成自己的发布证书与 Profile。
+
+各版本的改动见 [RELEASE_NOTES_OHOS.md](RELEASE_NOTES_OHOS.md)。
 
 ## 从源码构建
 
@@ -104,8 +117,12 @@ bash tool/build_hap.sh
 
 ## 已验证
 
-- 编译通过，debug HAP 覆盖安装到真机（MIA-AL00）
-- 应用启动、首页、直播间列表正常
+真机 nova 14 Pro（HarmonyOS 7.0.0.111 / API 26）：
+
+- release 与 debug HAP 覆盖安装、冷启动正常，启动阶段无白屏与 logo
+- 首页热门列表、分区网格、关注列表、录制中心四个页签切换正常，悬浮底栏全程在位
+- 底部导航为官方 HDS 沉浸光感材质（`IMMERSIVE` + `EXQUISITE`），背景实时模糊，Flutter 触摸未被原生层拦截
+- 直播全屏可强制横屏，退出全屏回竖屏
 - B 站 HTTP-FLV 直播流可播放，外接纹理正常出画，弹幕叠加正常
 
 ## 已知限制

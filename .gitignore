@@ -71,3 +71,6 @@ vendor/media_core_avplayer/ohos/oh_modules/
 vendor/media_core_avplayer/ohos/build/
 vendor/media_core_avplayer/ohos/.hvigor/
 vendor/media_core_avplayer/ohos/local.properties
+
+# Local device screenshots and build logs (鸿蒙真机验证产物，不入库)
+/test_capture/
